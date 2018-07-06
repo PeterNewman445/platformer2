@@ -17,7 +17,7 @@
 			physics:{
 				default: 'arcade',
 				arcade: {
-					gravity: {y: 500},
+					gravity: {y: 720},
 					debug: false
 				}
 			},
@@ -38,6 +38,9 @@
 		var text;
 		var score = 0;
 		var text;
+		var shade;
+
+
 
 		/**
 		 * [preload: This function is used to load the assets for our game]
@@ -53,18 +56,15 @@
 			//simple coin image
 			this.load.image('coin', 'assets/coinGold.png');
 
+			// this.load.image('coin', 'assets/unknown.png');
+
 			//player animations
 			this.load.atlas('player', 'assets/player.png', 'assets/player.json');
 
-			//spike trap
-			this.load.image('trap','assets/pixil-frame-0.png');
-
-			//SHADE
-			this.load.image('shade_img', 'assets/shade_zps896f4485.png', {fixedToCamera: true});
+			//AUDIO
+					this.load.audio('theme', ['assets/audio/music.mp3']);
 		}
 
-
-		var shade;
 
 		/**
 		 * [create: places assets on the screen]
@@ -97,9 +97,10 @@
 
 			//PLAYER
 				
-				player = this.physics.add.sprite(200, 200, 'player');
-				player.setBounce(0.5);
+				player = this.physics.add.sprite(200, 600, 'player');
+				player.setBounce(0.1);
 				player.setCollideWorldBounds(true);
+				// player.setPipeline("Light2D");
 
 				//Add Keyboard Events
 				cursors = this.input.keyboard.createCursorKeys();
@@ -141,14 +142,16 @@
 
 				coinLayer.setTileIndexCallback(17, collectCoin, this );
 
-			//TRAPS
-				//Traps image used as tileset
-				var trapTiles = map.addTilesetImage('Spike');
 
-				//add coints as tiles
-				TrapsLayer = map.createDynamicLayer('Spike', trapTiles, 0, 0);
 
-				// TrapsLayer.setTileIndexCallback(17, Death, this );
+				// //Trap image used as tileset
+				// var trapsTiles = map.addTilesetImage('unknown');
+
+				// //add traps as tiles
+				// trapsLayer = map.createDynamicLayer('Traps', trapTiles, 0, 0);
+
+				// trapsLayer.setTileIndexCallback(18, death, this );
+
 
 			//OBJECT COLLISIONS
 			
@@ -158,10 +161,25 @@
 				//Collision between coin and player
 				this.physics.add.overlap(player, coinLayer);
 
+				//Collision between coin and player
+				// this.physics.add.overlap(player, trapLayer);
+
+
+			//LIGHTS
+				this.lights.enable();
+				this.lights.addLight( player.x, player.y, 200, 0xffffff).setIntensity(0.5);
+
+
+			//AUDIO
+				music 		= this.sound.add( 'theme' );
+
+
+				soundManager( music );
+
 			//SHADE MAP
-				shade = this.add.image(360, 250, 'shade_img');
-				shade.setScrollFactor(0);
-				// shade.bringToTop();
+				// shade = this.add.image(360, 250, 'shade_img');
+
+				// this.shade.startFollow(player);
 
 			
 			//SCORE UI
@@ -171,6 +189,7 @@
 					fill: '#ffffff'
 				});
 				text.setScrollFactor(0);
+
 
 		}
 
@@ -185,6 +204,7 @@
 				if( cursors.left.isDown ){ // If the left arrow key is pressed down
 					//activate motion
 					player.body.setVelocityX(-200);
+
 
 					//activate animation
 					player.anims.play('walk', true);
@@ -204,6 +224,7 @@
 
 				}else{
 					player.body.setVelocityX(0);
+					// shade.body.setVelocityX(0);
 
 					player.anims.play('idle', true);
 				}
@@ -239,8 +260,14 @@
 			this.physics.pause();
 			player.setTint( 0xff0000 );
 			player.anims.play('idle');
+			music.stop();
 			gameOver = true;
 		}
+
+		function soundManager( clip ){					
+    		clip.play({loop: true});
+		}
+
 
 	</script>	
 	
